@@ -20,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     private final Path fileStorageLocation;
-    @Autowired
-    private KafkaSender kf;
 
     @Autowired
     public FileStorageService(FileStorageProperties fileStorageProperties) {

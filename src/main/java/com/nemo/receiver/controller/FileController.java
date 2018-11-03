@@ -1,37 +1,42 @@
 package com.nemo.receiver.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nemo.receiver.payload.UploadFileResponse;
+import com.nemo.receiver.service.AuthValidator;
 import com.nemo.receiver.service.FileStorageService;
-import com.nemo.receiver.service.KafkaSender;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class FileController {
     @Autowired
     private FileStorageService fileStorageService;
-
     @Autowired
-    private KafkaSender kafkaSender;
+    private AuthValidator authValidator;
+    @Autowired
+    private UploadFileResponse uploadFileResponse;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/upload")
-    public UploadFileResponse upload(@RequestParam("file") MultipartFile file) {
-        String fileName = fileStorageService.storeFile(file);
-        UploadFileResponse ufr = new UploadFileResponse(fileName, file.getContentType(), file.getSize());
+    public UploadFileResponse upload(@RequestHeader("X-NEMO-AUTH") String authToekn, @RequestParam("file") MultipartFile file) {
         try {
-            String ufJson = objectMapper.writeValueAsString(ufr);
-            kafkaSender.send("md-file-topic", ufJson);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            authValidator.validateToken(authToekn);
+        } catch (JWTVerificationException ex) {
+            // TODO: handle auth error
+            throw ex;
         }
-        return ufr;
+        String fileName = fileStorageService.storeFile(file);
+        uploadFileResponse.setFileName(fileName);
+        uploadFileResponse.setFileType(file.getContentType());
+        uploadFileResponse.setSize(file.getSize());
+        return uploadFileResponse;
+
     }
 }

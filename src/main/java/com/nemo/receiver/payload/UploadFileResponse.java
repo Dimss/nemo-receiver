@@ -1,26 +1,31 @@
 package com.nemo.receiver.payload;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+@Component
 public class UploadFileResponse {
+    @Autowired
+    private Environment env;
+
     private String fileName;
     private String fileType;
     private long size;
 
-    public UploadFileResponse(String fileName, String fileType, long size) {
-        this.fileName = fileName;
-        this.fileType = fileType;
-        this.size = size;
-    }
     /**
      * @return the fileName
      */
     public String getFileName() {
         return fileName;
     }
+
     /**
      * @param fileName the fileName to set
      */
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+        this.fileName = env.getProperty("app.assets.public.url") + "/" + fileName;
     }
 
     /**
