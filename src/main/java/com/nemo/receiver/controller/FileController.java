@@ -1,6 +1,7 @@
 package com.nemo.receiver.controller;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nemo.receiver.payload.UploadFileResponse;
 import com.nemo.receiver.service.AuthValidator;
@@ -26,12 +27,16 @@ public class FileController {
 
     @PostMapping("/upload")
     public UploadFileResponse upload(@RequestHeader("X-NEMO-AUTH") String authToekn, @RequestParam("file") MultipartFile file) {
+        String userId;
         try {
-            authValidator.validateToken(authToekn);
+            DecodedJWT jwt = authValidator.validateToken(authToekn);
+            userId = jwt.getSubject();
+
         } catch (JWTVerificationException ex) {
             // TODO: handle auth error
             throw ex;
         }
+
         String fileName = fileStorageService.storeFile(file);
         uploadFileResponse.setFileName(fileName);
         uploadFileResponse.setFileType(file.getContentType());

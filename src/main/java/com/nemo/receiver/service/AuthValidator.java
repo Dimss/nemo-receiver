@@ -10,13 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthValidator {
 
-    public Boolean
-    validateToken(String token) {
+    public DecodedJWT validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm).withIssuer("identity").build();
-            DecodedJWT jwt = verifier.verify(token);
-            return true;
+            return verifier.verify(token);
         } catch (JWTVerificationException exception) {
             throw exception;
         }
