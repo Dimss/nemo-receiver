@@ -7,6 +7,7 @@ import com.nemo.receiver.payload.UploadFileResponse;
 import com.nemo.receiver.service.AuthValidator;
 import com.nemo.receiver.service.FileStorageService;
 
+import com.nemo.receiver.service.LinksClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,15 +24,13 @@ public class FileController {
     private AuthValidator authValidator;
     @Autowired
     private UploadFileResponse uploadFileResponse;
-
+    @Autowired
+    private LinksClient linksClient;
 
     @PostMapping("/upload")
     public UploadFileResponse upload(@RequestHeader("X-NEMO-AUTH") String authToekn, @RequestParam("file") MultipartFile file) {
-        String userId;
         try {
-            DecodedJWT jwt = authValidator.validateToken(authToekn);
-            userId = jwt.getSubject();
-
+            authValidator.validateToken(authToekn);
         } catch (JWTVerificationException ex) {
             // TODO: handle auth error
             throw ex;
@@ -41,6 +40,7 @@ public class FileController {
         uploadFileResponse.setFileName(fileName);
         uploadFileResponse.setFileType(file.getContentType());
         uploadFileResponse.setSize(file.getSize());
+        linksClient.saveImageMetadata();
         return uploadFileResponse;
 
     }
