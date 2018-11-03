@@ -39,7 +39,7 @@ public class LinksClient {
 
     public void saveImageMetadata() {
         String url = linksAddr + "/v1/links";
-        Map<String,String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("X-NEMO-AUTH", authValidator.getUserIdentity().getToken());
         JSONObject jo = new JSONObject();
@@ -49,7 +49,7 @@ public class LinksClient {
                     .headers(headers)
                     .body(jo)
                     .asJson();
-            if (jsonResponse.getStatus() != 200){
+            if (jsonResponse.getStatus() != 200) {
                 throw new RuntimeException("Error during connecting to links service");
             }
         } catch (UnirestException ex) {
