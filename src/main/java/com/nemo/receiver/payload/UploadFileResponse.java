@@ -12,7 +12,17 @@ public class UploadFileResponse {
 
     private String fileName;
     private String fileType;
+    private String fileTitle;
     private long size;
+
+
+    public void setFileTitle(String fileTitle) {
+        this.fileTitle = fileTitle;
+    }
+
+    public String getFileTitle() {
+        return fileTitle;
+    }
 
     /**
      * @return the fileName

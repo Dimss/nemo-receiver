@@ -28,9 +28,11 @@ public class FileController {
     private LinksClient linksClient;
 
     @PostMapping("/upload")
-    public UploadFileResponse upload(@RequestHeader("X-NEMO-AUTH") String authToekn, @RequestParam("file") MultipartFile file) {
+    public UploadFileResponse upload(@RequestHeader("X-NEMO-AUTH") String authToken,
+                                     @RequestParam("file") MultipartFile file,
+                                     @RequestParam("fileTitle") String fileTitle) {
         try {
-            authValidator.validateToken(authToekn);
+            authValidator.validateToken(authToken);
         } catch (JWTVerificationException ex) {
             // TODO: handle auth error
             throw ex;
@@ -40,6 +42,7 @@ public class FileController {
         uploadFileResponse.setFileName(fileName);
         uploadFileResponse.setFileType(file.getContentType());
         uploadFileResponse.setSize(file.getSize());
+        uploadFileResponse.setFileTitle(fileTitle);
         linksClient.saveImageMetadata();
         return uploadFileResponse;
 

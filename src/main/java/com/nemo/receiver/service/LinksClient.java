@@ -44,6 +44,7 @@ public class LinksClient {
         headers.put("X-NEMO-AUTH", authValidator.getUserIdentity().getToken());
         JSONObject jo = new JSONObject();
         jo.append("link", uploadFileResponse.getFileName());
+        jo.append("title", uploadFileResponse.getFileTitle());
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.post(url)
                     .headers(headers)
