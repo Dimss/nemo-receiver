@@ -35,7 +35,7 @@ public class UploadFileResponse {
      * @param fileName the fileName to set
      */
     public void setFileName(String fileName) {
-        this.fileName = env.getProperty("app.assets.public.prefix") + "/" + fileName;
+        this.fileName =  "image/" + fileName;
     }
 
     /**

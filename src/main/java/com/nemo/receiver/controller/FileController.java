@@ -6,15 +6,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nemo.receiver.payload.UploadFileResponse;
 import com.nemo.receiver.service.AuthValidator;
 import com.nemo.receiver.service.FileStorageService;
-
 import com.nemo.receiver.service.LinksClient;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 public class FileController {
@@ -45,6 +50,16 @@ public class FileController {
         uploadFileResponse.setFileTitle(fileTitle);
         linksClient.saveImageMetadata();
         return uploadFileResponse;
-
     }
+
+    @GetMapping("/image/{fileName}")
+    public ResponseEntity<byte[]> getImage(@PathVariable("fileName") String fileName) throws IOException {
+        FileInputStream fs = new FileInputStream("public/photos/" + fileName);
+        byte[] bytes = StreamUtils.copyToByteArray(fs);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(bytes);
+    }
+
 }
